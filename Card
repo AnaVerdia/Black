@@ -1,0 +1,68 @@
+
+public class Card {
+	
+	private String suit;
+	private int rank;
+	private boolean faceUp;
+	
+	//Creates card
+	public Card(int r, String S){
+		rank = r;
+		suit = S;
+		faceUp = true;
+	}
+	
+	//Returns the value of the card
+	public int value(){
+		int value = 0;
+		if (rank >= 10){
+			value = 10;
+		}
+		else if (rank == 1){
+			value = 11;
+		}
+		else{
+			value = rank;
+		}
+		return value;
+	}
+	
+	//Sets card face down
+	public boolean setDown(){
+		faceUp = false;
+		return faceUp;
+	}
+	public boolean setUp(){
+		faceUp = true;
+		return faceUp;
+	}
+	
+	//Displays the card
+	public void display(){
+		String ranks = "ranks";
+		if (faceUp){
+			if (rank == 1){
+				ranks = "Ace";
+			}
+			else if (rank == 11){
+				ranks = "Jack";
+			}
+			else if (rank == 12){
+				ranks = "Queen";
+			}
+			else if (rank == 13){
+				ranks = "King";
+			}
+			if (ranks.equals("ranks")){
+			System.out.print(" " + rank + " of " + suit);	
+			}
+			if (!ranks.equals("ranks")){
+			System.out.print(ranks + " of " + suit);
+			}
+			
+		}
+		else if (faceUp == false){
+			System.out.print(" ? of ?");
+		}
+	}
+}
