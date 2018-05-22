@@ -1,0 +1,83 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Player {
+	private ArrayList<Card> Hand;
+	private int wallet;
+
+	//Creates a brand new player
+	public Player(){
+		Hand = new ArrayList<Card>();
+		wallet = 10;
+	}
+
+	//Draws a card from the deck
+	public void draw(Card x){
+		Hand.add(x);
+	}
+
+	// calculates how much money is left after betting
+	public int bet(int cash){
+		Scanner input = new Scanner(System.in);
+		while (cash > wallet){
+			System.out.println("Please only bet what you have, How much would you"
+					+ " like to bet? ");
+			cash = input.nextInt();
+		}
+
+		wallet -= cash;
+		return wallet;
+	}
+
+	public int totalCash(){
+		System.out.println();
+		return wallet;
+	}
+
+	public int winnings(int bet){
+
+		return wallet += 2* bet;
+	}
+
+	//Displays the players hand
+	public void display(){
+		for (int i = 0; i < Hand.size(); i ++){
+
+			Hand.get(i).display();
+			System.out.println("\t");
+		}
+	}
+
+	public int getValue(){
+		int totalSumOfHand = 0;
+		for (int i = 0; i < Hand.size(); i++){
+			totalSumOfHand += Hand.get(i).value();		
+		}
+		return totalSumOfHand;
+	}
+
+	public Card get(int n ){
+		return Hand.get(n);
+	}
+
+	public int handSize(){
+		return Hand.size();
+	}
+
+	public void remove(){
+		while (0 < Hand.size()){
+			Hand.remove(0);
+		}
+
+	}
+
+	public int aceCounter(){
+		int aceCount = 0;
+		for (int i = 0; i < Hand.size(); i ++){
+			if (Hand.get(i).value() == 11){
+				aceCount += 1;
+			}
+		}
+		return aceCount;
+	}
+}
