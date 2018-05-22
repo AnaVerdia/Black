@@ -1,0 +1,225 @@
+/* Ana Verdia
+ * Project Blackjack
+ * 10/5/2017
+ */
+
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String [] args){
+		// Loop back to menu
+		int menuChoice = 1; // initialize to an arbitrary value
+		Deck dealerDeck = new Deck();
+		Player dealer = new Player();
+		Player you = new Player();
+
+		while (menuChoice != 5){
+			Scanner input = new Scanner(System.in);			
+
+			//Menu option output
+			System.out.println();
+			System.out.println("Menu Options");
+			System.out.println("1. New Deck");
+			System.out.println("2. Shuffle");
+			System.out.println("3. Display All Cards");
+			System.out.println("4. Play Blackjack");
+			System.out.println("5. Quit");
+			System.out.println();
+
+			menuChoice = input.nextInt();
+			System.out.println();
+
+			//Checks that choice input matches options 
+			while (menuChoice <= 0 || menuChoice >= 6){
+				System.out.println("Please enter a valid choice");
+				menuChoice = input.nextInt();
+			}
+
+			//Goes through each menu option and executes accordingly
+			if (menuChoice == 1){ 
+				dealerDeck = new Deck();
+				System.out.println("You have a new deck!");
+			}
+			else if (menuChoice == 5) {
+				break;
+			}
+			else if (menuChoice == 2){
+				dealerDeck.shuffle();
+				System.out.println("You have shuffled your current deck!");
+			}			
+			else if (menuChoice ==3){
+				dealerDeck.display();
+			}			
+			else if (menuChoice ==4 ){
+				System.out.println("Total money left to bet: " + you.totalCash());
+
+				if (you.totalCash() <= 0){
+					System.out.println("You do not have sufficient funds");
+				}
+
+				while (you.totalCash() > 0 && dealerDeck.size() > 9) {
+
+					/* Beginning of Set Up */
+
+					//Gets deck shuffled
+					dealerDeck.shuffle();
+					System.out.println("Deck has been shuffled!");
+
+					//Bet from the player
+					System.out.println("How much would you like to bet? ");
+					int bet = input.nextInt();
+					you.bet(bet);
+					System.out.println("Total money left to bet: " + you.totalCash());
+
+					//gives card to dealer faced down
+					Card tempCard = dealerDeck.deal();
+					tempCard.setDown();
+					dealer.draw(tempCard);
+
+					//Gives card to player
+					tempCard = dealerDeck.deal();
+					you.draw(tempCard);
+
+					//gives card to dealer
+					dealer.draw(dealerDeck.deal());
+					System.out.println("Dealer's hand: " );
+					dealer.display();
+					System.out.println();
+
+					//gives another card to player
+					System.out.println();
+					you.draw(dealerDeck.deal());
+					System.out.println("Your Hand: ");
+					System.out.println("your hand value is: " + you.getValue());
+					you.display();
+					System.out.println();
+
+					/* End of Set Up */
+
+					//checks to see if the player wants more cards
+					//while yes*******
+					char choice = 'y';
+					boolean lost = false;
+					int playerValue = you.getValue();
+
+					// PLAYER WHILE LOOP STARTS //
+					while (!lost){										
+						System.out.println("Would you like more cards? [y/n]");
+						choice = input.next().charAt(0);
+
+						if(!(choice == 'y' || choice == 'Y'))
+							break;
+
+						you.draw(dealerDeck.deal());
+						you.display();
+						playerValue = you.getValue();
+
+						System.out.println();
+						int ace11Counter = you.aceCounter();
+						//over 21 with aces
+						while(playerValue > 21 && ace11Counter > 0){
+							playerValue -= 10*ace11Counter;
+							ace11Counter --;
+							if (playerValue <= 21 ){
+								break;
+							}
+						}
+
+						System.out.println("Your hand value is: " + playerValue);
+
+						//Over 21 with out aces
+						if (playerValue > 21) {//&& aceCounter == 0
+							System.out.println("Sorry but you lost bud");
+							System.out.println("You have " + you.totalCash() + " dollars left.");
+							lost = true;
+						}
+					}
+					// PLAYER WHILE LOOP ENDS //
+
+
+					//The player has stopped taking cards therefore its time for the dealer 
+					if (choice == 'n' || choice == 'N'){
+						tempCard = dealer.get(0);
+						tempCard.setUp();
+						System.out.println("Dealer flips card over");
+						dealer.display();
+						int dealerValue = dealer.getValue();
+						System.out.println("Dealer's hand: ");
+						dealer.display();
+						System.out.println();
+						System.out.println();
+						System.out.println("The dealer's hand is " + dealerValue);						
+						
+						while(dealerValue < 17 ){
+							dealer.draw(dealerDeck.deal());
+							System.out.println("Dealer's hand: ");
+							dealer.display();
+							System.out.println();
+							System.out.println();
+							
+							int ace11Counter = dealer.aceCounter();
+							dealerValue = dealer.getValue();
+							
+							//over 21 with aces
+							while(dealerValue > 21 && ace11Counter > 0){
+								dealerValue -= 10*ace11Counter;
+								ace11Counter --;
+								if (dealerValue <= 21 ){
+									break;
+								}
+							}
+							
+							System.out.println("The dealer's hand is " + dealerValue);
+						}
+
+						if (dealerValue > 21) {
+							System.out.println("The dealer has lost");
+							System.out.println("Congrats to the player!");
+						}
+						else if (dealerValue <= 21){
+							if (dealerValue >= playerValue) {
+								System.out.println();
+								System.out.println("The house wins");
+								System.out.println("House value: " + dealerValue);
+								System.out.println("You hand value: " + playerValue);
+							} else if (dealerValue < playerValue) {
+								System.out.println();
+								System.out.println("The player wins");
+								System.out.println("House value: " + dealerValue);
+								System.out.println("You hand value: " + playerValue);
+								System.out.println("You now stand at " + you.winnings(bet));
+							}
+						}
+					}
+
+					//would you like to continue playing
+					System.out.println("Would you like to continue playing? [y/n]");
+					choice = input.next().charAt(0);
+
+					if (choice == 'y'|| choice == 'Y'){
+						menuChoice = 4;
+						you.remove();
+						dealer.remove();
+						System.out.println();
+						bet = you.totalCash();
+					}
+					else{
+						//menu to ask if they'd like to play again
+						System.out.println();
+						System.out.println("Menu Options");
+						System.out.println("1. New Deck");
+						System.out.println("2. Shuffle");
+						System.out.println("3. Display All Cards");
+						System.out.println("4. Play Blackjack");
+						System.out.println("5. Quit");
+
+						menuChoice = input.nextInt();
+						System.out.println();
+
+					}
+
+				}
+			}
+		}
+	}
+}
